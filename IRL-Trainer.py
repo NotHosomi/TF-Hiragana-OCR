@@ -205,11 +205,11 @@ test_dataset = test_dataset.batch(BATCH_SIZE).shuffle(BATCH_SIZE)
 #
 #-------------------
 model = tf.keras.Sequential([
-  tf.keras.layers.Conv2D(64, (3,3), activation='relu', input_shape=(48, 48, 1)),
+  tf.keras.layers.Conv2D(71, (3,3), activation='relu', input_shape=(48, 48, 1)),
   tf.keras.layers.MaxPooling2D(2,2),
-  tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+  tf.keras.layers.Conv2D(71, (3,3), activation='relu'),
   tf.keras.layers.MaxPooling2D(2,2),
-  tf.keras.layers.Conv2D(64, (3,3), activation='relu'),
+  tf.keras.layers.Conv2D(71, (3,3), activation='relu'),
   tf.keras.layers.MaxPooling2D(2,2),
   tf.keras.layers.Flatten(),
   tf.keras.layers.Dropout(0.5),
