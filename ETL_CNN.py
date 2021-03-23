@@ -112,6 +112,7 @@ test_dataset = test_dataset.batch(BATCH_SIZE)
 #   NET SETUP
 #
 #-------------------
+"""
 model = tf.keras.Sequential([
   tf.keras.layers.Conv2D(128, (3,3), activation='relu', input_shape=shape),
   tf.keras.layers.MaxPooling2D(2,2),
@@ -148,3 +149,4 @@ eval_plot(model, test_dataset)
 """
 
 #model.save("models/ETL8/e" + str(num_epochs))
+"""

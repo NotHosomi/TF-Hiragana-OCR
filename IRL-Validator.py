@@ -191,12 +191,13 @@ print("imgs shape", images.shape)
 print("lbls shape", labels.shape)
 dataset = tf.data.Dataset.from_tensor_slices((images, labels))
 dataset = dataset.shuffle(size)
-dataset = dataset.batch(BATCH_SIZE)
+dataset = dataset.batch(size)
 
 #------
 #
 # MODEL
 #
 #------
-model = tf.keras.models.load_model("models/ETL8/e10")
-eval_plot(model, test_dataset)
+model = tf.keras.models.load_model("models/IRL/e10")
+#model = tf.keras.models.load_model("models/ETL8/e10")
+eval_plot(model, dataset)
