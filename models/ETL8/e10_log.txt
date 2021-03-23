@@ -1,0 +1,39 @@
+Epoch:  0
+Test loss: 0.6152999401092529 
+Test accuracy: 0.8204225301742554
+
+Epoch:  1
+Test loss: 0.3921625316143036 
+Test accuracy: 0.872799277305603
+
+Epoch:  2
+Test loss: 0.27823606133461 
+Test accuracy: 0.9097711443901062
+
+Epoch:  3
+Test loss: 0.25737088918685913 
+Test accuracy: 0.9141725301742554
+
+Epoch:  4
+Test loss: 0.17033855617046356 
+Test accuracy: 0.9458626508712769
+
+Epoch:  5
+Test loss: 0.1644483059644699 
+Test accuracy: 0.9480633735656738
+
+Epoch:  6
+Test loss: 0.14882001280784607 
+Test accuracy: 0.9502640962600708
+
+Epoch:  7
+Test loss: 0.12327704578638077 
+Test accuracy: 0.9595070481300354
+
+Epoch:  8
+Test loss: 0.12207603454589844 
+Test accuracy: 0.9599471688270569
+
+Epoch:  9
+Test loss: 0.12961307168006897 
+Test accuracy: 0.9595070481300354
