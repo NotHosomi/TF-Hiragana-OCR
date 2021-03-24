@@ -85,6 +85,37 @@ def eval_plot(model, test_dataset):
 
 
 #
+
+#------
+#
+# LOSS/ACC PLOTTING
+#
+#------
+def plot_hist(hist):
+    # loss
+    plt.plot(hist[0], 'b-', )
+    plt.plot(hist[2], 'r-', )
+    plt.axis([0, hist[0].size-1, 0, 0.5])
+    plt.ylabel("Loss")
+    plt.xlabel("Epoch")
+    plt.legend(["Train", "Test"])
+    plt.show()
+    # accuracy
+    plt.plot(hist[1], 'b-', )
+    plt.plot(hist[3], 'r-', )
+    plt.axis([0, hist[0].size-1, 0.5, 1])
+    plt.ylabel("Accuracy")
+    plt.xlabel("Epoch")
+    plt.legend(["Train", "Test"])
+    plt.show()
+    
+#
+
+#------
+#
+# DATA LOADING
+#
+#------
 def load_rand(size):
     char_ids = []
     imgs = np.zeros([size, 48, 48]) #image size
@@ -230,7 +261,7 @@ def build_model(c1, c2 = 0, c3 = 0, c4 = 0, c5 = 0, drop = 0.5, dense = 1024):
               metrics=['accuracy'])
     return model
 
-def run(model, num_epochs, name):
+def run_keyinfo(model, num_epochs, name):
     #print("\n\n---------\n  NEW MODEL: ", name, "_e", num_epochs, "\n---------\n")
     print("\n", name, "e" + str(num_epochs))
     best_acc = -1
@@ -277,6 +308,26 @@ def run(model, num_epochs, name):
     print("waypoints: ", acc_at_5, acc_at_10, acc_at_20, acc_at_30, acc_at_40, acc_at_50)
     print("landmarks: ", landmark95, landmark99)
     model.save("models/IRL/" + name + "_e" + str(num_epochs))
+
+
+def run_fullinfo(model, num_epochs, name):
+    print("\n\n---------\n  NEW MODEL: ", name, "_e", num_epochs, "\n---------\n")
+    # tr loss, tr acc, te loss, te acc
+    hist = np.zeros([4, num_epochs])
+    for i in range (0, num_epochs):
+        #print("\nEpoch: ", i)
+        # TRAIN
+        fit_hist = model.fit(train_dataset, epochs=1, steps_per_epoch=math.ceil(size/BATCH_SIZE), verbose=2)
+        hist[0][i] = fit_hist.history.get("loss")[-1]
+        hist[1][i] = fit_hist.history.get("accuracy")[-1]
+        # EVAL
+        test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
+        hist[2][i] = test_loss
+        hist[3][i] = test_acc
+        #print('Test loss:', test_loss, '\nTest accuracy:', test_acc)
+    model.save("models/IRL/" + name + "_e" + str(num_epochs))
+    print(hist)
+    return hist
     
 
 
@@ -285,22 +336,52 @@ def run(model, num_epochs, name):
 #   TRAINING
 #
 #-------------------
+#e = 2
+#m = build_model(64, 64, 64)
+#run_fullinfo(m, e, "test")
+
 e = 50
+
+m = build_model(64, 64, 64)
+hist_a = run_fullinfo(m, e, "3x64(2)")
+
+m = build_model(128, 64, 32)
+hist_b = run_fullinfo(m, e, "128_64_32(3)")
+
+m = build_model(128, 64, 32, dense = 512)
+hist_c = run_fullinfo(m, e, "128_64_32_d512(2)")
+
+m = build_model(128, 64, 32, dense = 768)
+hist_d = run_fullinfo(m, e, "128_64_32_d768")
+
+m = build_model(128, 128, 128)
+hist_e = run_fullinfo(m, e, "3x128")
+
+m = build_model(128, 128, 128, dense = 512)
+hist_f = run_fullinfo(m, e, "3x128_d512")
+
+plot_hist(hist_a)
+plot_hist(hist_b)
+plot_hist(hist_c)
+plot_hist(hist_d)
+plot_hist(hist_e)
+plot_hist(hist_f)
+
+"""
 m = build_model(64, 64, 64)
 run(m, e, "3x64")
 
 m = build_model(128, 64, 32)
-run(m, e, "128_64_32 (2)")
+run(m, e, "128_64_32(3)")
 
 m = build_model(128, 64, 32, dense = 512)
-run(m, e, "128_64_32_d512 (2)")
+run(m, e, "128_64_32_d512(2)")
 
 m = build_model(32, 64, 128)
 run(m, e, "32_64_128")
 
 m = build_model(32, 64, 128, dense = 512)
 run(m, e, "32_64_128_d512")
-
 
 m = build_model(64, 64, 64, 64)
 run(m, e, "4x64")
@@ -355,3 +436,4 @@ run(m, e, "2x32_2x64_128")
 
 m = build_model(32, 32, 64, 64, 128, dense = 512)
 run(m, e, "2x32_2x64_128_d512")
+"""
