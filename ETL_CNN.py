@@ -144,7 +144,11 @@ for i in range (0, num_epochs):
     test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
     print('Test loss:', test_loss, '\nTest accuracy:', test_acc)
 """
-model = tf.keras.models.load_model("models/ETL8/e10")
+#model = tf.keras.models.load_model("models/ETL8/e10")
+#model = tf.keras.models.load_model("models/IRL/128_64_32_d512_e30")
+#model = tf.keras.models.load_model("models/IRL/3x64_e30")
+model = tf.keras.models.load_model("models/IRL/e10")
+model.fit(train_dataset, epochs=1, steps_per_epoch=math.ceil(train_images.shape[0]/BATCH_SIZE), verbose=2)
 eval_plot(model, test_dataset)
 """
 

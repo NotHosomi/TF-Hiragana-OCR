@@ -204,22 +204,80 @@ test_dataset = test_dataset.batch(BATCH_SIZE).shuffle(BATCH_SIZE)
 #   NET SETUP
 #
 #-------------------
-model = tf.keras.Sequential([
-  tf.keras.layers.Conv2D(71, (3,3), activation='relu', input_shape=(48, 48, 1)),
-  tf.keras.layers.MaxPooling2D(2,2),
-  tf.keras.layers.Conv2D(71, (3,3), activation='relu'),
-  tf.keras.layers.MaxPooling2D(2,2),
-  tf.keras.layers.Conv2D(71, (3,3), activation='relu'),
-  tf.keras.layers.MaxPooling2D(2,2),
-  tf.keras.layers.Flatten(),
-  tf.keras.layers.Dropout(0.5),
-  tf.keras.layers.Dense(1024, activation='relu'),
-  tf.keras.layers.Dense(71, activation="softmax")
-])
-model.compile(optimizer='adam',
+def build_model(c1, c2 = 0, c3 = 0, c4 = 0, c5 = 0, drop = 0.5, dense = 1024):
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Conv2D(c1, (3,3), activation='relu', input_shape=(48, 48, 1)))
+    model.add(tf.keras.layers.MaxPooling2D(2,2))
+    if(c2 != 0):
+        model.add(tf.keras.layers.Conv2D(c2, (3,3), activation='relu'))
+        model.add(tf.keras.layers.MaxPooling2D(2,2))
+    if(c3 != 0):
+        model.add(tf.keras.layers.Conv2D(c3, (3,3), activation='relu'))
+        model.add(tf.keras.layers.MaxPooling2D(2,2))
+    if(c4 != 0):
+        model.add(tf.keras.layers.Conv2D(c4, (3,3), activation='relu'))
+        model.add(tf.keras.layers.MaxPooling2D(2,2))
+    if(c5 != 0):
+        model.add(tf.keras.layers.Conv2D(c5, (3,3), activation='relu'))
+        model.add(tf.keras.layers.MaxPooling2D(2,2))
+    model.add(tf.keras.layers.Flatten())
+    if(drop != 0):
+        model.add(tf.keras.layers.Dropout(drop))
+    model.add(tf.keras.layers.Dense(dense, activation='relu'))
+    model.add(tf.keras.layers.Dense(71, activation="softmax"))
+    model.compile(optimizer='adam',
               loss="sparse_categorical_crossentropy",
               metrics=['accuracy'])
+    return model
 
+def run(model, num_epochs, name):
+    #print("\n\n---------\n  NEW MODEL: ", name, "_e", num_epochs, "\n---------\n")
+    print("\n", name, "e" + str(num_epochs))
+    best_acc = -1
+    best_acc_e = -1
+    best_los = 10
+    best_los_e = -1
+    acc_at_5 = 0
+    acc_at_10 = 0
+    acc_at_20 = 0
+    acc_at_30 = 0
+    acc_at_40 = 0
+    acc_at_50 = 0
+    landmark95 = 0
+    landmark99 = 0
+    for i in range (0, num_epochs):
+        #print("\nEpoch: ", i)
+        model.fit(train_dataset, epochs=1, steps_per_epoch=math.ceil(size/BATCH_SIZE), verbose=2)
+        test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
+        #print('Test loss:', test_loss, '\nTest accuracy:', test_acc)
+        if(best_acc < test_acc):
+            best_acc = test_acc
+            best_acc_e = i
+            if(landmark95 == 0 and best_acc > 0.95):
+                landmark95 == best_acc
+            if(landmark99 == 0 and best_acc > 0.99):
+                landmark99 == best_acc
+        if(best_los > test_loss):
+            best_los = test_loss
+            best_los_e = i 
+        if(i == 4):
+            acc_at_5 = test_acc
+        elif(i == 9):
+            acc_at_10 = test_acc
+        elif(i == 19):
+            acc_at_20 = test_acc
+        elif(i == 29):
+            acc_at_30 = test_acc
+        elif(i == 39):
+            acc_at_40 = test_acc
+        elif(i == 49):
+            acc_at_50 = test_acc
+    print("\nBest acc:  ", best_acc, "@", best_acc_e)
+    print("Best loss: ", best_los, "@", best_los_e)
+    print("waypoints: ", acc_at_5, acc_at_10, acc_at_20, acc_at_30, acc_at_40, acc_at_50)
+    print("landmarks: ", landmark95, landmark99)
+    model.save("models/IRL/" + name + "_e" + str(num_epochs))
+    
 
 
 #-------------------
@@ -227,14 +285,73 @@ model.compile(optimizer='adam',
 #   TRAINING
 #
 #-------------------
-num_epochs = 10
-for i in range (0, num_epochs):
-    print("\nEpoch: ", i)
-    model.fit(train_dataset, epochs=1, steps_per_epoch=math.ceil(size/BATCH_SIZE), verbose=2)
-    #eval(model, test_dataset)
-    test_loss, test_acc = model.evaluate(test_dataset, verbose=0)
-    print('Test loss:', test_loss, '\nTest accuracy:', test_acc)
+e = 50
+m = build_model(64, 64, 64)
+run(m, e, "3x64")
 
-model.save("models/IRL/e" + str(num_epochs))
+m = build_model(128, 64, 32)
+run(m, e, "128_64_32 (2)")
 
-eval_plot(model, test_dataset)
+m = build_model(128, 64, 32, dense = 512)
+run(m, e, "128_64_32_d512 (2)")
+
+m = build_model(32, 64, 128)
+run(m, e, "32_64_128")
+
+m = build_model(32, 64, 128, dense = 512)
+run(m, e, "32_64_128_d512")
+
+
+m = build_model(64, 64, 64, 64)
+run(m, e, "4x64")
+
+m = build_model(64, 64, 64, 64, 64)
+run(m, e, "5x64")
+
+m = build_model(32, 32, 32, 32, 32)
+run(m, e, "5x32")
+
+m = build_model(64, 64, 64, 64, 64, dense = 512)
+run(m, e, "5x64_d512")
+
+m = build_model(128, 128, 128)
+run(m, e, "3x128")
+
+m = build_model(128, 128, 128, dense = 512)
+run(m, e, "3x128_d512")
+
+m = build_model(128, 128, 128, 128)
+run(m, e, "4x128")
+
+m = build_model(128, 128, 128, 128, dense = 512)
+run(m, e, "4x128_d512")
+
+m = build_model(128, 128, 128, 128, 128)
+run(m, e, "5x128")
+
+m = build_model(128, 128, 128, 128, 128, dense = 512)
+run(m, e, "5x128_d512")
+
+m = build_model(32, 64, 128, 128, 128)
+run(m, e, "32_64_3x128")
+
+m = build_model(32, 64, 128, 128, 128, dense = 512)
+run(m, e, "32_64_3x128_d512")
+
+m = build_model(32, 64, 64, 128)
+run(m, e, "32_2x64_128")
+
+m = build_model(32, 64, 64, 128, dense = 512)
+run(m, e, "32_2x64_128_d512")
+
+m = build_model(32, 64, 64, 128, 128)
+run(m, e, "32_2x64_2x128")
+
+m = build_model(32, 64, 64, 128, 128, dense = 512)
+run(m, e, "32_2x64_2x128_d512")
+
+m = build_model(32, 32, 64, 64, 128)
+run(m, e, "2x32_2x64_128")
+
+m = build_model(32, 32, 64, 64, 128, dense = 512)
+run(m, e, "2x32_2x64_128_d512")

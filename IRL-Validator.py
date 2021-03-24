@@ -198,6 +198,6 @@ dataset = dataset.batch(size)
 # MODEL
 #
 #------
-model = tf.keras.models.load_model("models/IRL/e10")
+model = tf.keras.models.load_model("models/IRL/128_64_32_d512_e30")
 #model = tf.keras.models.load_model("models/ETL8/e10")
 eval_plot(model, dataset)
