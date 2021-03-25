@@ -119,6 +119,8 @@ def save_hist(hist, name):
     plt.xlabel("Epoch")
     plt.legend(["Train", "Test"])
     plt.savefig("evals/" + name + "_loss.png")
+    plt.clf()    
+
     # accuracy
     plt.plot(hist[1], 'b-', )
     plt.plot(hist[3], 'r-', )
@@ -127,6 +129,7 @@ def save_hist(hist, name):
     plt.xlabel("Epoch")
     plt.legend(["Train", "Test"])
     plt.savefig("evals/" + name + "_acc.png")    
+    plt.clf()
 #
 
 #------
@@ -345,7 +348,7 @@ def run_fullinfo(model, num_epochs, name):
         hist[2][i] = test_loss
         hist[3][i] = test_acc
         #print('Test loss:', test_loss, '\nTest accuracy:', test_acc)
-    model.save("models/IRL/" + name + "_e" + str(num_epochs))
+    #model.save("models/IRL/" + name + "_e" + str(num_epochs))
     print(hist)
     save_hist(hist, name)
     return hist
@@ -361,35 +364,42 @@ def run_fullinfo(model, num_epochs, name):
 #m = build_model(64, 64, 64)
 #save_hist(run_fullinfo(m, e, "test"), "test")
 e = 50
+#batch 6
 
+m = build_model(64, 64, 64)
+run_fullinfo(m, e, "b6__3x64(3)")
 
-m = build_model(128, 64, 32)
-run_fullinfo(m, e, "b2__128_64_32")
+m = build_model(64, 64, 64)
+run_fullinfo(m, e, "b6__3x64(4)")
 
-m = build_model(128, 128, 128, d1 = 512)
-run_fullinfo(m, e, "b2__128_64_32_d512(3)")
-
+#batch 5
+"""
 m = build_model(128, 128, 128, d1 = 512, d2 = 256)
-run_fullinfo(m, e, "b5__3x128_d512_d256")
+run_fullinfo(m, e, "b5__3x128_d512_d256(2)")
 
 m = build_model(128, 128, 128, d1 = 1024, d2 = 512)
-run_fullinfo(m, e, "b5__3x128_d1024_d512")
+run_fullinfo(m, e, "b5__3x128_d1024_d512(2)")
 
-m = build_model(64, 64, 64, 64, 64)
-run_fullinfo(m, e, "b5__5x64")
+m = build_model(64, 64, 64, 64)
+run_fullinfo(m, e, "b5__4x64")
 
-m = build_model(128, 128, 128, 128, 128)
-run_fullinfo(m, e, "b5__5x128")
+m = build_model(128, 128, 128, 128)
+run_fullinfo(m, e, "b5__4x128")
 
 m = build_model(256, 128, 64)
 run_fullinfo(m, e, "b5__256_128_64")
 
 m = build_model(256, 256, 256)
 run_fullinfo(m, e, "b5__3x256")
-
-
 """
-e = 50
+"""
+m = build_model(128, 64, 32)
+run_fullinfo(m, e, "128_64_32(2)")
+
+m = build_model(128, 128, 128, d1 = 512)
+run_fullinfo(m, e, "128_64_32_d512(2)")
+"""
+"""
 m = build_model(64, 64, 64)
 hist_a = run_fullinfo(m, e, "3x64(2)")
 
@@ -484,4 +494,14 @@ run(m, e, "2x32_2x64_128")
 
 m = build_model(32, 32, 64, 64, 128, dense = 512)
 run(m, e, "2x32_2x64_128_d512")
+"""
+"""
+m = build_model(32, 32, 32)
+run_fullinfo(m, e, "3x32")
+
+m = build_model(32, 32, 32, d1 = 512)
+run_fullinfo(m, e, "3x32_d512")
+
+m = build_model(32, 32, 64, 64)
+run_fullinfo(m, e, "2x32_2x64")
 """

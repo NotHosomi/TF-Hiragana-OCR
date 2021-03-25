@@ -1,3 +1,6 @@
+# UNUSED!!!
+# See resize_images.py
+
 import os
 
 label_hira = ["あ","い","う","え","お","か","が","き","ぎ","く","ぐ","け","げ","こ","ご","さ",
