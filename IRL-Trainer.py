@@ -110,6 +110,24 @@ def plot_hist(hist):
     plt.show()
     
 #
+def save_hist(hist, name):
+    # loss
+    plt.plot(hist[0], 'b-', )
+    plt.plot(hist[2], 'r-', )
+    plt.axis([0, hist[0].size-1, 0, 0.5])
+    plt.ylabel("Loss")
+    plt.xlabel("Epoch")
+    plt.legend(["Train", "Test"])
+    plt.savefig("evals/" + name + "_loss.png")
+    # accuracy
+    plt.plot(hist[1], 'b-', )
+    plt.plot(hist[3], 'r-', )
+    plt.axis([0, hist[0].size-1, 0.5, 1])
+    plt.ylabel("Accuracy")
+    plt.xlabel("Epoch")
+    plt.legend(["Train", "Test"])
+    plt.savefig("evals/" + name + "_acc.png")    
+#
 
 #------
 #
@@ -235,7 +253,7 @@ test_dataset = test_dataset.batch(BATCH_SIZE).shuffle(BATCH_SIZE)
 #   NET SETUP
 #
 #-------------------
-def build_model(c1, c2 = 0, c3 = 0, c4 = 0, c5 = 0, drop = 0.5, dense = 1024):
+def build_model(c1, c2 = 0, c3 = 0, c4 = 0, c5 = 0, drop = 0.5, d1 = 1024, d2 = 1024):
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Conv2D(c1, (3,3), activation='relu', input_shape=(48, 48, 1)))
     model.add(tf.keras.layers.MaxPooling2D(2,2))
@@ -254,7 +272,9 @@ def build_model(c1, c2 = 0, c3 = 0, c4 = 0, c5 = 0, drop = 0.5, dense = 1024):
     model.add(tf.keras.layers.Flatten())
     if(drop != 0):
         model.add(tf.keras.layers.Dropout(drop))
-    model.add(tf.keras.layers.Dense(dense, activation='relu'))
+    model.add(tf.keras.layers.Dense(d1, activation='relu'))
+    if(d2 != 0):
+        model.add(tf.keras.layers.Dense(d2, activation='relu'))
     model.add(tf.keras.layers.Dense(71, activation="softmax"))
     model.compile(optimizer='adam',
               loss="sparse_categorical_crossentropy",
@@ -327,6 +347,7 @@ def run_fullinfo(model, num_epochs, name):
         #print('Test loss:', test_loss, '\nTest accuracy:', test_acc)
     model.save("models/IRL/" + name + "_e" + str(num_epochs))
     print(hist)
+    save_hist(hist, name)
     return hist
     
 
@@ -338,26 +359,53 @@ def run_fullinfo(model, num_epochs, name):
 #-------------------
 #e = 2
 #m = build_model(64, 64, 64)
-#run_fullinfo(m, e, "test")
-
+#save_hist(run_fullinfo(m, e, "test"), "test")
 e = 50
 
+
+m = build_model(128, 64, 32)
+run_fullinfo(m, e, "b2__128_64_32")
+
+m = build_model(128, 128, 128, d1 = 512)
+run_fullinfo(m, e, "b2__128_64_32_d512(3)")
+
+m = build_model(128, 128, 128, d1 = 512, d2 = 256)
+run_fullinfo(m, e, "b5__3x128_d512_d256")
+
+m = build_model(128, 128, 128, d1 = 1024, d2 = 512)
+run_fullinfo(m, e, "b5__3x128_d1024_d512")
+
+m = build_model(64, 64, 64, 64, 64)
+run_fullinfo(m, e, "b5__5x64")
+
+m = build_model(128, 128, 128, 128, 128)
+run_fullinfo(m, e, "b5__5x128")
+
+m = build_model(256, 128, 64)
+run_fullinfo(m, e, "b5__256_128_64")
+
+m = build_model(256, 256, 256)
+run_fullinfo(m, e, "b5__3x256")
+
+
+"""
+e = 50
 m = build_model(64, 64, 64)
 hist_a = run_fullinfo(m, e, "3x64(2)")
 
 m = build_model(128, 64, 32)
 hist_b = run_fullinfo(m, e, "128_64_32(3)")
 
-m = build_model(128, 64, 32, dense = 512)
+m = build_model(128, 64, 32, d1 = 512)
 hist_c = run_fullinfo(m, e, "128_64_32_d512(2)")
 
-m = build_model(128, 64, 32, dense = 768)
+m = build_model(128, 64, 32, d1 = 768)
 hist_d = run_fullinfo(m, e, "128_64_32_d768")
 
 m = build_model(128, 128, 128)
 hist_e = run_fullinfo(m, e, "3x128")
 
-m = build_model(128, 128, 128, dense = 512)
+m = build_model(128, 128, 128, d1 = 512)
 hist_f = run_fullinfo(m, e, "3x128_d512")
 
 plot_hist(hist_a)
@@ -366,7 +414,7 @@ plot_hist(hist_c)
 plot_hist(hist_d)
 plot_hist(hist_e)
 plot_hist(hist_f)
-
+"""
 """
 m = build_model(64, 64, 64)
 run(m, e, "3x64")
